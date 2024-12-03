@@ -1,0 +1,386 @@
+"use client";
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import Sidebar from "../../../../../../components/Sidebar";
+import DashboardNav from "../../../../../../components/DashboardNav";
+import { useRouter, useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { BsFillTrashFill } from "react-icons/bs";
+import { MdOutlineEdit } from "react-icons/md";
+import Image from "next/image";
+
+const page = () => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const title = searchParams.get("title");
+  const imgSrc = searchParams.get("imgSrc");
+  const { id } = useParams(); // This will correctly extract the dynamic id from the URL
+
+  const [sections, setSections] = useState([
+    {
+      id: 1,
+      title: "Introduction",
+      lectures: [{ id: 1, title: "Introduction to the Course" }],
+      quizzes: [],
+      assignments: [],
+    },
+  ]);
+
+  // States for managing the addition of lectures, quizzes, and assignments
+  const [newLecture, setNewLecture] = useState("");
+  const [isAddingLecture, setIsAddingLecture] = useState(null); // Track lecture input visibility per section
+  const [newQuiz, setNewQuiz] = useState({ title: "", description: "" }); // Track quiz data
+  const [isAddingQuiz, setIsAddingQuiz] = useState(null); // Track quiz input visibility per section
+  const [newAssignment, setNewAssignment] = useState({ title: "", description: "" }); // Track assignment data
+  const [isAddingAssignment, setIsAddingAssignment] = useState(null); // Track assignment input visibility per section
+
+  // Function to add a new section
+  const addSection = () => {
+    const newSection = {
+      id: sections.length + 1,
+      title: `Section ${sections.length + 1}`,
+      lectures: [],
+      quizzes: [],
+      assignments: [],
+    };
+    setSections([...sections, newSection]);
+  };
+
+  // Function to add a new lecture to a section
+  const handleAddLecture = (sectionIndex) => {
+    const updatedSections = [...sections];
+    const newLectureId = updatedSections[sectionIndex].lectures.length + 1;
+
+    updatedSections[sectionIndex].lectures.push({
+      id: newLectureId,
+      title: newLecture,
+    });
+
+    setSections(updatedSections);
+    setNewLecture(""); // Reset input
+    setIsAddingLecture(null); // Close input box
+  };
+
+  // Function to add a new quiz to a section
+  const handleAddQuiz = (sectionIndex) => {
+    const updatedSections = [...sections];
+    const newQuizId = updatedSections[sectionIndex].quizzes.length + 1;
+
+    updatedSections[sectionIndex].quizzes.push({
+      id: newQuizId,
+      title: newQuiz.title,
+      description: newQuiz.description,
+    });
+
+    setSections(updatedSections);
+    setNewQuiz({ title: "", description: "" }); // Reset quiz input
+    setIsAddingQuiz(null); // Close quiz form
+  };
+
+  // Function to add a new assignment to a section
+  const handleAddAssignment = (sectionIndex) => {
+    const updatedSections = [...sections];
+    const newAssignmentId =
+      updatedSections[sectionIndex].assignments.length + 1;
+
+    updatedSections[sectionIndex].assignments.push({
+      id: newAssignmentId,
+      title: newAssignment.title,
+      description: newAssignment.description,
+    });
+
+    setSections(updatedSections);
+    setNewAssignment({ title: "", description: "" }); // Reset assignment input
+    setIsAddingAssignment(null); // Close assignment form
+  };
+
+  return (
+    <div className="flex w-full">
+      {/* Sidebar */}
+      <Sidebar />
+
+      {/* Main Content */}
+      <div className="ml-60 w-full">
+        {/* Dashboard Navigation */}
+        <div className="bg-white w-full h-[128px]">
+          <DashboardNav />
+        </div>
+
+        {/* Content */}
+        <motion.div
+          className="p-8"
+          initial={{ opacity: 0, scale: 0.9, rotate: 10 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          exit={{ opacity: 0, scale: 0.9, rotate: 30 }}
+          transition={{
+            duration: 1,
+            ease: "easeInOut",
+            type: "spring",
+            stiffness: 300,
+          }}
+        >
+          {/* Course Content Header */}
+          <h1 className="text-3xl font-bold text-center mb-6">
+            Course Content
+          </h1>
+
+          {/* Sections & Lectures */}
+          {sections.map((section, sectionIndex) => (
+            <div
+              key={section.id}
+              className="border border-black mb-6 rounded-sm bg-[#EEEFF4] p-4"
+            >
+              <p className="text-[20px] text-black font-bold mb-1">
+                Section {section.id}:
+              </p>
+              <div className="flex flex-row items-center gap-2 mb-4">
+                <Image
+                  src="/assets/file-preview.png"
+                  width={24}
+                  height={24}
+                  alt="file preview"
+                />
+                <p className="text-black font-medium text-[20px]">
+                  {section.title}
+                </p>
+              </div>
+              {/* Lectures */}
+              {section.lectures.map((lecture) => (
+                <div
+                  key={lecture.id}
+                  className="flex justify-between items-center justify-items-center bg-white border-black border p-3 mb-4 rounded-sm"
+                >
+                  <div className="flex flex-row items-center">
+                    <Image
+                      src="/assets/check-black.png"
+                      width={24}
+                      height={24}
+                      alt="check"
+                    />
+                    <p className="text-lg ml-1">
+                      <span className="font-medium text-black text-[20px]">
+                        Lecture {lecture.id}:
+                      </span>
+                    </p>
+                    <div className="flex flex-row ml-2 items-center">
+                      <Image
+                        src="/assets/file-preview.png"
+                        width={24}
+                        height={24}
+                        alt="file preview"
+                        className="w-[24px] h-[24px]"
+                      />
+                      <p className="text-black font-medium text-[20px]">
+                        {lecture.title}
+                      </p>
+                    </div>
+                    <div className="flex space-x-1 ml-2">
+                      <MdOutlineEdit className="cursor-pointer text-xl text-black" />
+                      <BsFillTrashFill className="cursor-pointer text-xl text-black" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {/* Quizzes */}
+              {section.quizzes.map((quiz) => (
+                <div
+                  key={quiz.id}
+                  className="flex justify-between items-center bg-white border-black border p-3 mb-4 rounded-sm"
+                >
+                  <div className="flex flex-row items-center">
+                    <Image
+                      src="/assets/quiz-icon.png"
+                      width={24}
+                      height={24}
+                      alt="quiz"
+                    />
+                    <p className="text-lg ml-1">
+                      <span className="font-medium text-black text-[20px]">
+                        Quiz {quiz.id}:
+                      </span>
+                    </p>
+                    <div className="flex flex-row ml-2 items-center">
+                      <p className="text-black font-medium text-[20px]">
+                        {quiz.title}
+                      </p>
+                    </div>
+                    <p className="text-gray-500 ml-4">{quiz.description}</p>
+                  </div>
+                </div>
+              ))}
+
+              {/* Assignments */}
+              {section.assignments.map((assignment) => (
+                <div
+                  key={assignment.id}
+                  className="flex justify-between items-center bg-white border-black border p-3 mb-4 rounded-sm"
+                >
+                  <div className="flex flex-row items-center">
+                    <Image
+                      src="/assets/assignment-icon.png"
+                      width={24}
+                      height={24}
+                      alt="assignment"
+                    />
+                    <p className="text-lg ml-1">
+                      <span className="font-medium text-black text-[20px]">
+                        Assignment {assignment.id}:
+                      </span>
+                    </p>
+                    <div className="flex flex-row ml-2 items-center">
+                      <p className="text-black font-medium text-[20px]">
+                        {assignment.title}
+                      </p>
+                    </div>
+                    <p className="text-gray-500 ml-4">
+                      {assignment.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+
+              {/* Add Lecture Frame */}
+              {isAddingLecture === sectionIndex && (
+                <div className="border border-gray-300 p-4 mb-4 rounded-sm">
+                  <label className="block text-lg mb-2">New Lecture:</label>
+                  <input
+                    type="text"
+                    value={newLecture}
+                    onChange={(e) => setNewLecture(e.target.value)}
+                    className="border border-gray-400 p-2 w-full mb-2"
+                    placeholder="Enter lecture title"
+                  />
+                  <button
+                    onClick={() => handleAddLecture(sectionIndex)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                  >
+                    Add Lecture
+                  </button>
+                </div>
+              )}
+
+              {/* Add Quiz Frame */}
+              {isAddingQuiz === sectionIndex && (
+                <div className="border border-gray-300 p-4 mb-4 rounded-sm">
+                  <label className="block text-lg mb-2">New Quiz:</label>
+                  <input
+                    type="text"
+                    value={newQuiz.title}
+                    onChange={(e) =>
+                      setNewQuiz({ ...newQuiz, title: e.target.value })
+                    }
+                    className="border border-gray-400 p-2 w-full mb-2"
+                    placeholder="Enter quiz title"
+                  />
+                  <textarea
+                    value={newQuiz.description}
+                    onChange={(e) =>
+                      setNewQuiz({ ...newQuiz, description: e.target.value })
+                    }
+                    className="border border-gray-400 p-2 w-full mb-2"
+                    placeholder="Enter quiz description"
+                  />
+                  <button
+                    onClick={() => handleAddQuiz(sectionIndex)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                  >
+                    Add Quiz
+                  </button>
+                </div>
+              )}
+
+              {/* Add Assignment Frame */}
+              {isAddingAssignment === sectionIndex && (
+                <div className="border border-gray-300 p-4 mb-4 rounded-sm">
+                  <label className="block text-lg mb-2">New Assignment:</label>
+                  <input
+                    type="text"
+                    value={newAssignment.title}
+                    onChange={(e) =>
+                      setNewAssignment({
+                        ...newAssignment,
+                        title: e.target.value,
+                      })
+                    }
+                    className="border border-gray-400 p-2 w-full mb-2"
+                    placeholder="Enter assignment title"
+                  />
+                  <textarea
+                    value={newAssignment.description}
+                    onChange={(e) =>
+                      setNewAssignment({
+                        ...newAssignment,
+                        description: e.target.value,
+                      })
+                    }
+                    className="border border-gray-400 p-2 w-full mb-2"
+                    placeholder="Enter assignment description"
+                  />
+                  <button
+                    onClick={() => handleAddAssignment(sectionIndex)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                  >
+                    Add Assignment
+                  </button>
+                </div>
+              )}
+
+              {/* Add Buttons for Lectures, Quizzes, and Assignments */}
+              <div className="flex space-x-4 mt-4">
+                <button
+                  onClick={() =>
+                    setIsAddingLecture(
+                      isAddingLecture === sectionIndex ? null : sectionIndex
+                    )
+                  }
+                  className="bg-green-500 text-white px-4 py-2 rounded-md"
+                >
+                  {isAddingLecture === sectionIndex
+                    ? "Cancel Lecture"
+                    : "Add Lecture"}
+                </button>
+
+                <button
+                  onClick={() =>
+                    setIsAddingQuiz(
+                      isAddingQuiz === sectionIndex ? null : sectionIndex
+                    )
+                  }
+                  className="bg-purple-500 text-white px-4 py-2 rounded-md"
+                >
+                  {isAddingQuiz === sectionIndex ? "Cancel Quiz" : "Add Quiz"}
+                </button>
+
+                <button
+                  onClick={() =>
+                    setIsAddingAssignment(
+                      isAddingAssignment === sectionIndex ? null : sectionIndex
+                    )
+                  }
+                  className="bg-yellow-500 text-white px-4 py-2 rounded-md"
+                >
+                  {isAddingAssignment === sectionIndex
+                    ? "Cancel Assignment"
+                    : "Add Assignment"}
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {/* Add Section Button */}
+          <div className="text-center mt-6">
+            <button
+              onClick={addSection}
+              className="bg-blue-500 text-white px-6 py-3 rounded-md"
+            >
+              Add Section
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+export default page;
