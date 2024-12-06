@@ -54,7 +54,7 @@ const Page = () => {
     router.push(`/lecturer/dashboard/${id}`);
   };
 
-  const [selectedImage, setSelectedImage] = useState("/assets/images/profile.jpg");
+  const [selectedImage, setSelectedImage] = useState("/assets/images/user.png");
   const [fileName, setFileName] = useState("No file selected");
 
   const handleImageChange = (event) => {

@@ -58,7 +58,8 @@ const Signup = () => {
       const response = await loginApi(`api/auth/login`, value);
       if (response.success) {
         setErrorMsg("");
-        router.push(`/student/dashboard/${response.data._id}`);
+        //router.push(`/student/dashboard/${response.data._id}`);
+        router.push(`/student/getstarted/welcome/${response.data._id}`);
       } else {
         setErrorMsg(response.message);
       }

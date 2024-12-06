@@ -167,10 +167,11 @@ const page = () => {
               {courses.map((course) => (
                 <div key={course._id} className="flex flex-col">
                   <Image
-                    src={"/assets/cys321.png"}
+                    src={course.thumbnail}
                     width={306}
                     height={256}
                     alt="Course Thumbnail"
+                    className="h-[300px] w-[300px]"
                   />
                   <p className="text-black font-bold text-[18px] w-[286px]">
                     {course.name}

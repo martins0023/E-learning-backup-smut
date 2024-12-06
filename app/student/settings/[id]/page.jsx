@@ -5,20 +5,6 @@ import React, { useState, useEffect, Suspense, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { GetApi } from "../../../../utils/Actions";
 
-const GetLecturer = async (id) => {
-  try {
-    const response = await GetApi(`api/lecturer/get-user/${id}`);
-    if (response.success) {
-      return response.data;
-    } else {
-      console.error(response.message);
-      return null;
-    }
-  } catch (err) {
-    console.error(err.message);
-    return null;
-  }
-};
 // Dynamically import ReactQuill without SSR
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 import "react-quill/dist/quill.snow.css";
@@ -47,14 +33,18 @@ const Page = () => {
   }, []);
 
   const createCourse = () => {
-    router.push(`/lecturer/dashboard/getstarted/${params.id}`);
+    router.push(`/student/dashboard/getstarted/${params.id}`);
   };
 
   const navHome = () => {
-    router.push(`/lecturer/dashboard/${id}`);
+    router.push(`/student/dashboard/${id}`);
   };
 
-  const [selectedImage, setSelectedImage] = useState("/assets/images/profile.jpg");
+  const handleBack = () => {
+    router.back(); // Navigate to the previous page
+  };
+
+  const [selectedImage, setSelectedImage] = useState("/assets/images/user.png");
   const [fileName, setFileName] = useState("No file selected");
 
   const handleImageChange = (event) => {
@@ -70,32 +60,28 @@ const Page = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (id) {
-        const lecturerData = await GetLecturer(id);
-        setData(lecturerData);
+  const GetStudent = async () => {
+    try {
+      const response = await GetApi(`api/student/${id}`);
+      if (response.success) {
+        setData(response.data);
+        setCourses(response.data.courses || []); // Assuming courses is inside response.data
+        setErrorMsg("");
+      } else {
+        setErrorMsg(response.message);
       }
-    };
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const getCourses = async () => {
-      try {
-        const response = await GetApi(`api/course/lecturer-course/${id}`);
-        if (response.success) {
-          setErrorMsg("");
-          setCourses(response.data || []); // Handle empty course list
-        } else {
-          setErrorMsg(response.message || "Failed to load courses.");
-        }
-      } catch (err) {
-        setErrorMsg(err.message || "An error occurred while fetching courses.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-    getCourses();
-  }, [id]);
+  if (id) {
+    GetStudent();
+  }
+}, [id]); // Run effect when 'id' changes
 
   if (loading) {
     return <p>Loading...</p>; // Show loading while data is being fetched
@@ -123,7 +109,7 @@ const Page = () => {
           onClick={createCourse}
           className="bg-primary text-white rounded-md h-[41px] px-6 py-2"
         >
-          Create New Class/Event
+          join the class
         </button>
         <div className="flex items-center cursor-pointer">
           <div className="relative mr-4">
@@ -144,7 +130,7 @@ const Page = () => {
               alt="name"
               width={50}
               height={50}
-              className="rounded-full"
+              className="rounded-full w-[50px] h-[50px]"
             />
             <p className="ml-2 text-black font-semibold">Hi, {data.firstname}</p>
           </div>
@@ -152,6 +138,9 @@ const Page = () => {
       </header>
 
       <div className="p-20">
+      <div className="mb-10 cursor-pointer" onClick={handleBack}>
+          <Image src="/assets/back_icon.png" width={25} height={20} alt="Back" />
+        </div>
         <div className="flex flex-row justify-between mb-8">
           <p className="text-black font-bold text-[48px]">Profile & Settings</p>
         </div>
@@ -200,24 +189,26 @@ const Page = () => {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold">Headline</label>
+              <label className="block text-gray-700 font-semibold">Level</label>
               <input
+                disabled
                 type="text"
-                placeholder="Headline"
+                placeholder={data.level}
                 className="w-full border border-gray-300 p-4 rounded-md h-[66px]"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold">Biography</label>
+              <label className="block text-gray-700 font-semibold">Matriculation Number</label>
               {/*<div className="flex items-center space-x-2 mb-2">
                 <button className="text-gray-700 font-semibold">B</button>
                 <button className="text-gray-700 font-semibold italic">I</button>
                 </div>*/}
-              <textarea
-                placeholder={data.bio}
-                className="w-full border border-gray-300 p-2 rounded-md"
-                rows="4"
-              ></textarea>
+              <input
+                disabled
+                type="text"
+                placeholder={data.matric_no}
+                className="w-full border border-gray-300 p-4 rounded-md h-[66px]"
+              />
             </div>
             <div className="flex justify-end">
               <button className="bg-primary text-white px-6 rounded-full w-[184px] mt-4 text-[24px] h-[64px]">Save</button>

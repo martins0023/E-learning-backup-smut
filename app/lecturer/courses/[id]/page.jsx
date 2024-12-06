@@ -113,7 +113,7 @@ const Page = () => {
                   <div className="flex items-center gap-4">
                     <Image
                       // src={`/assets/cys313.png`}
-                      src={"/assets/course1.png"}
+                      src={course.thumbnail}
                       alt={course.title}
                       width={100}
                       height={100}

@@ -55,7 +55,7 @@ const Sidebar = (props) => {
             { name: 'Submissions', path: `/student/submissions/${props.params}`, icon: '/assets/submissions-icon.png' },
             { name: 'Group', path: `/student/group/${props.params}`, icon: '/assets/students-icon.png' },
             { name: 'Quiz', path: `/student/quiz/${props.params}`, icon: '/assets/quiz-icon.png' },
-            { name: 'Settings', path: `/student/profile/${props.params}`, icon: '/assets/settings-icon.png' },
+            { name: 'Settings', path: `/student/settings/${props.params}`, icon: '/assets/settings-icon.png' },
           ].map((item, index) => (
             <li key={index} className="relative">
               <Link

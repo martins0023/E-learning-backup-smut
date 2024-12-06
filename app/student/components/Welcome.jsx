@@ -1,11 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-
+import { useRouter, useParams } from "next/navigation";
 
 
 
 const Welcome = async ({data}) => {
+  const router = useRouter();
+  const params = useParams();
+
+  const navContinue = () => {
+    router.push(`/student/dashboard/${params.id}`);
+  }
   return (
     <div className="flex flex-col items-center">
       <div className="mt-10">
@@ -45,12 +51,12 @@ const Welcome = async ({data}) => {
         </div>
       </div>
       <div className="mt-5">
-        <Link
-          href="/student/getstarted/login"
-          className="flex items-center justify-center bg-primary text-white font-normal text-[20px] w-[691px] rounded-full h-[64px]"
+        <div
+          onClick={navContinue}
+          className="flex items-center cursor-pointer justify-center bg-primary text-white font-normal text-[20px] w-[691px] rounded-full h-[64px]"
         >
-          Go to Login
-        </Link>
+          Continue
+        </div>
       </div>
     </div>
   );

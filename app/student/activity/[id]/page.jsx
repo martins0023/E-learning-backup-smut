@@ -13,7 +13,8 @@ const page = () => {
   const router = useRouter();
 
   const navigateToDetails = (id) => {
-    router.push(`/student/courses/${id}`); // Navigate to dynamic page
+    router.push(`/student/activity/activityDetails/${params.id}`); // Navigate to dynamic page
+    
   };
 
   // Function to handle filtering logic

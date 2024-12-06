@@ -14,13 +14,17 @@ const Dashboard = () => {
     router.push(`/student/attendance`);
   };
 
-  const JoinClass = (id) => {
+  const JoinClass = () => {
     router.push(`/student/courses/classroom/start/${params.id}`);
   };
 
   const ViewDetails = (id) => {
     router.push(`/student/courses/course-detail/${params.id}?courseId=${id}`);
   };
+
+  const viewActivity = () => {
+    router.push(`/student/activity/${params.id}`)
+  }
 
   const [isClient, setIsClient] = useState(false);
   const [details, setDetails] = useState({})
@@ -141,7 +145,7 @@ const Dashboard = () => {
                             key={index}
                             className="bg-primary h-[250px] w-[233px] p-4 rounded-lg"
                           >
-                            <p className="text-white text-[12px] font-normal">{`Lecture at ${lecture.time}`}</p>
+                            <p className="text-white text-[12px] font-normal">{`Lecture at ${lecture.schedule.time}`}</p>
   
                             <h3 className="text-[20px] font-bold text-white mt-1">
                               {lecture.name} ({lecture.code})
@@ -153,7 +157,7 @@ const Dashboard = () => {
                                 width={16}
                                 height={16}
                               />
-                              <p className="text-white font-normal text-[12px]">{`Class starts in ${lecture.startsIn}`}</p>
+                              <p className="text-white font-normal text-[12px]">{`Duration ${lecture.schedule.duration}`}</p>
                             </div>
                             <div className="flex flex-row gap-2 items-center mt-2">
                               <Image
@@ -162,7 +166,7 @@ const Dashboard = () => {
                                 width={16}
                                 height={16}
                               />
-                              <p className="text-white font-normal text-[12px]">{`${lecture.date}`}</p>
+                              <p className="text-white font-normal text-[12px]">Day of the week: {`${lecture.schedule.day}`}</p>
                             </div>
                             <div className="flex justify-between mt-4">
                               <button onClick={() => JoinClass(lecture.class_link.link)} className="text-[12px] bg-white w-[105px] rounded-sm h-[27px] text-primary justify-items-center text-center items-center">
@@ -176,81 +180,6 @@ const Dashboard = () => {
                         ))
 
                       )}
-                      <div className="bg-white w-fit h-fit pb-4 rounded-lg">
-                        <div className="flex flex-col gap-1 mt-2 p-3">
-                          <div className="flex flex-row items-center gap-1">
-                            <Image
-                              src="/assets/access-time-gray.png"
-                              width={12}
-                              height={12}
-                              alt="access time"
-                              className="w-[12px] h-[12px]"
-                            />
-                            <p className="text-[10px] text-[#000000cc] font-normal">
-                              Next at 01:30 Pm
-                            </p>
-                          </div>
-
-                          <div className="flex flex-row items-center gap-1">
-                            <Image
-                              src="/assets/access-calendar.png"
-                              width={12}
-                              height={12}
-                              alt="access time"
-                              className="w-[12px] h-[12px]"
-                            />
-                            <p className="text-[10px] text-[#00000079] font-normal">
-                              Mon Feb 14
-                            </p>
-                          </div>
-
-                          <p className="text-[10px] text-[#000000c4] font-normal">
-                            Hacking
-                          </p>
-                        </div>
-                        <hr className="h-1 w-full text-[#000000c4] mt-2" />
-                        <div className="flex flex-col gap-1  p-3">
-                          <div className="flex flex-row items-center gap-1">
-                            <Image
-                              src="/assets/access-time-gray.png"
-                              width={12}
-                              height={12}
-                              alt="access time"
-                              className="w-[12px] h-[12px]"
-                            />
-                            <p className="text-[10px] text-[#000000cc] font-normal">
-                              Next at 01:30 Pm
-                            </p>
-                          </div>
-
-                          <div className="flex flex-row items-center gap-1">
-                            <Image
-                              src="/assets/access-calendar.png"
-                              width={12}
-                              height={12}
-                              alt="access time"
-                              className="w-[12px] h-[12px]"
-                            />
-                            <p className="text-[10px] text-[#00000079] font-normal">
-                              Mon Feb 14
-                            </p>
-                          </div>
-
-                          <p className="text-[10px] text-[#000000c4] font-normal">
-                            Hacking
-                          </p>
-                        </div>
-                        <hr className="h-1 w-full text-[#000000c4] mt-2" />
-                        <div className="flex justify-center mt-4">
-                          <Image
-                            src="/assets/next.png"
-                            className="cursor-pointer"
-                            width={30}
-                            height={30}
-                            alt="next"
-                          />
-                        </div>
-                      </div>
                     </div>
                     {/* col 2 */}
                     {/* Attendance section */}
@@ -271,7 +200,7 @@ const Dashboard = () => {
 
                           <div className="flex flex-row items-center justify-between">
                             <p className="text-[#8E1011] font-semibold text-[14px]">
-                              58%
+                              1%
                             </p>
                             <p className="text-black font-medium text-[10px]">
                               Overall Attendance
@@ -280,7 +209,7 @@ const Dashboard = () => {
                           <div className="w-full bg-gray-200 h-[4px] mt-2">
                         <div
                           className="bg-primary h-[4px]"
-                          style={{ width: 130 }}
+                          style={{ width: 5 }}
                         ></div>
                       </div>
                           <button onClick={handleAttendance} className="text-black mt-3 underline text-[10px]">
@@ -307,7 +236,7 @@ const Dashboard = () => {
                             </div>
 
                             <div className="flex flex-row items-center justify-end">
-                              <button className="text-black font-normal text-[10px] ">
+                              <button onClick={viewActivity} className="text-black font-normal text-[10px] ">
                                 View all
                               </button>
                             </div>
@@ -321,17 +250,17 @@ const Dashboard = () => {
                                 type: "Quiz",
                                 resources: ["Shared PDF"],
                                 icons: ["/assets/pdf.png"],
-                                image: ["/assets/images/profile.jpg"],
+                                image: ["/assets/images/user.png"],
                               },
                               {
-                                title: "Dr Jimoh H",
+                                title: "Mr Jimoh H",
                                 time: "4 mins ago",
                                 type: "Quiz",
                                 resources: [
                                   "Shared Ethical Hacking Notes & Study Material",
                                 ],
                                 icons: ["/assets/pdf.png", "/assets/doc.png"],
-                                image: ["/assets/images/profile.jpg"],
+                                image: ["/assets/images/user.png"],
                               },
                               {
                                 title: "Dr Asakpa",
@@ -341,7 +270,7 @@ const Dashboard = () => {
                                   "Shared Ethical Hacking Notes & Study Material",
                                 ],
                                 icons: ["/assets/pdf.png", "/assets/doc.png"],
-                                image: ["/assets/images/profile.jpg"],
+                                image: ["/assets/images/user.png"],
                               },
                               // Add more items here as needed
                             ].map((item, index) => (

@@ -112,6 +112,11 @@ const courseActivitysData = [
 const page = () => {
   const [filter, setFilter] = useState("all"); // filter state
   const params = useParams();
+  const router = useRouter();
+
+  const handleBack = () => {
+    router.back(); // Navigate to the previous page
+  };
 
   // Function to handle filtering logic
   const filteredStudents = courseActivitysData.filter((courseActivity) => {
@@ -143,6 +148,14 @@ const page = () => {
             stiffness: 300,
           }}
         >
+          <div className="mb-10 cursor-pointer" onClick={handleBack}>
+            <Image
+              src="/assets/back_icon.png"
+              width={25}
+              height={20}
+              className="w-[25px] h-[20px] rounded-full"
+            />
+          </div>
           <div className="flex flex-row items-center justify-between">
             <div className="flex flex-row gap-2 items-center p-3">
               <Image

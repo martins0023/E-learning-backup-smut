@@ -35,7 +35,12 @@ const Page = () => {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all"); // filter state
   const params = useParams();
+  const router = useRouter();
   //const studentTotal = length(studentGroup);
+
+  const handleBack = () => {
+    router.back(); // Navigate to the previous page
+  };
 
   //
   const filteredSubmits = studentGroup.filter((student) => {
@@ -99,6 +104,14 @@ const Page = () => {
             stiffness: 300,
           }}
         >
+          <div className="mb-10 cursor-pointer" onClick={handleBack}>
+            <Image
+              src="/assets/back_icon.png"
+              width={25}
+              height={20}
+              className="w-[25px] h-[20px] rounded-full"
+            />
+          </div>
           <div className="flex flex-row gap-[40px]">
             <div className="flex flex-col">
               <h1 className="text-[32px] font-semibold mb-4">

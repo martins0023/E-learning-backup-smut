@@ -5,28 +5,28 @@ import DashboardNav from "../../../components/DashboardNav";
 import Sidebar from "../../../components/Sidebar";
 import { useRouter, useParams } from "next/navigation";
 
-const submissionType = [
-  {
-    id: 1,
-    submissionName: "Individual Project Submission",
-    type: "/student/submissions/project/individual",
-  },
-  {
-    id: 2,
-    submissionName: "Group Project Submission",
-    type: "/student/submissions/project/group",
-  },
-  {
-    id: 3,
-    submissionName: "Project Submission Status",
-    type: "/student/submissions/project/status",
-  },
-];
-
 const Page = () => {
   const params = useParams();
   const [filter, setFilter] = useState("all"); // filter state
   const router = useRouter();
+
+  const submissionType = [
+    {
+      id: 1,
+      submissionName: "Individual Project Submission",
+      type: `/student/submissions/project/individual/${params.id}`,
+    },
+    {
+      id: 2,
+      submissionName: "Group Project Submission",
+      type: `/student/submissions/project/group/${params.id}`,
+    },
+    {
+      id: 3,
+      submissionName: "Submission Project Status",
+      type: `/student/submissions/project/status/${params.id}`,
+    },
+  ];
 
   // Function to handle filtering logic
   const filteredSubmits = submissionType.filter((student) => {

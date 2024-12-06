@@ -5,6 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { GetApi } from "../../../../utils/Actions";
 import coursesData from "../../data/courses"; // Import course data
 import LogoutButton from "../../../../components/LogoutButton";
+import DashboardNav from "../../components/DashboardNav";
+import Sidebar from "../../components/Sidebar";
 
 const Page = () => {
   const router = useRouter();
@@ -14,6 +16,24 @@ const Page = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [loadingCourse, setLoadingCourse] = useState(false);
+  const params = useParams();
+
+  const GetLecturer = async (id) => {
+    try {
+      const response = await GetApi(`api/lecturer/get-user/${id}`);
+      if (response.success) {
+        return response.lecturerdata;
+      } else {
+        console.error(response.message);
+        return null;
+      }
+    } catch (err) {
+      console.error(err.message);
+      return null;
+    }
+  };
+
+  
 
   useEffect(() => {
     const GetStudent = async () => {

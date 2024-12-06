@@ -127,7 +127,7 @@ const CoursesPage = () => {
                 >
                   <div className="flex items-center gap-3">
                     <Image
-                      src={"/assets/course1.png"}
+                      src={course.thumbnail}
                       width={188}
                       height={188}
                       alt="course"
@@ -142,7 +142,7 @@ const CoursesPage = () => {
                           src={course?.lecturer_id.image ? course?.lecturer_id.image : "/assets/images/user.png"}
                           width={25}
                           height={25}
-                          className="rounded-full"
+                          className="rounded-full w-[25px] h-[25px]"
                           alt="lecturer"
                         />
                         <p className="font-medium text-black text-[16px]">

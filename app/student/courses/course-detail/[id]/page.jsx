@@ -1,6 +1,6 @@
 "use client";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react"; // Import useState to handle expand/collapse state
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import DashboardNav from "../../../components/DashboardNav";
@@ -10,19 +10,22 @@ import { GetApi } from "../../../../../utils/Actions";
 const CourseDetails = () => {
   const searchParams = useSearchParams();
   const params = useParams();
-  const courseId = searchParams.get("courseId")
-  // const { id } = params;
+  const courseId = searchParams.get("courseId");
   const router = useRouter();
   const [details, setDetails] = useState({});
-  const [course, setCourse] = useState([]);
+  const [course, setCourse] = useState(null);
+  const [lecturer, setLecturer] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [loadingStudent, setLoadingStudent] = useState(false);
   const [loadingCourse, setLoadingCourse] = useState(false);
+  const [loadingLecturer, setLoadingLecturer] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({}); // Track expanded sections
 
-
+  const handleBack = () => {
+    router.back(); // Navigate to the previous page
+  };
 
   useEffect(() => {
-
     const getStudent = async () => {
       try {
         setLoadingStudent(true);
@@ -32,24 +35,23 @@ const CourseDetails = () => {
           setErrorMsg("");
 
           setLoadingCourse(true);
-          await GetApi(
-            `api/course/${courseId}`
-          )
-            .then((result) => {
-              if (result.success) {
-                setCourse(result.data);
-                setErrorMsg("");
-              } else {
-                setErrorMsg(result.message);
-              }
-            })
-            .catch((err) => {
-              console.log(err);
-              setErrorMsg(err.message);
-            })
-            .finally(() => {
-              setLoadingCourse(false);
-            });
+          const result = await GetApi(`api/course/${courseId}`);
+          if (result.success) {
+            setCourse(result.data);
+            setErrorMsg("");
+
+            // Now fetch the lecturer's details using lecturer_id
+            setLoadingLecturer(true);
+            const lecturerResult = await GetApi(`api/lecturer/get-user/${result.data.lecturer_id.$oid}`);
+            if (lecturerResult.success) {
+              setLecturer(lecturerResult.data);
+              setErrorMsg("");
+            } else {
+              setErrorMsg(lecturerResult.message);
+            }
+          } else {
+            setErrorMsg(result.message);
+          }
         } else {
           setErrorMsg(response.message);
         }
@@ -58,14 +60,13 @@ const CourseDetails = () => {
         setErrorMsg(err.message);
       } finally {
         setLoadingStudent(false);
+        setLoadingCourse(false);
+        setLoadingLecturer(false);
       }
     };
 
     getStudent();
-  }, []);
-
-
-  const [expandedSections, setExpandedSections] = useState({}); // State to track expanded sections
+  }, [courseId, params.id]);
 
   const toggleSection = (index) => {
     setExpandedSections((prev) => ({
@@ -75,16 +76,19 @@ const CourseDetails = () => {
   };
 
   const navigateToLecture = () => {
-    router.push(`/student/courses/classroom/${id}`);
+    router.push(`/student/courses/classroom/${params.id}`);
   };
 
   const navigateToLecturer = () => {
-    //router.push(`/dashboard/profile/${id}`);
-    router.push(`/dashboard/profile`);
+    router.push(`/lecturer/lecturerpublic/${lecturer?.staff_id}`);
   };
 
-  if(loadingStudent) {
-    return <div className="">Loading...</div>
+  if (loadingStudent || loadingCourse) {
+    return <div>Loading...</div>;
+  }
+
+  if (!course) {
+    return <div className="text-center">Course details not available</div>;
   }
 
   return (
@@ -108,47 +112,59 @@ const CourseDetails = () => {
           }}
         >
           <div className="flex gap-[60px]">
-            <div>
+            {/* Course Overview Section */}
+            <div className="flex flex-col">
+              <div className="mb-10 cursor-pointer" onClick={handleBack}>
+                <Image
+                  src="/assets/back_icon.png"
+                  width={25}
+                  height={20}
+                  className="w-[25px] h-[20px] rounded-full"
+                />
+              </div>
               <Image
-                src={course.thumbnail}
+                src={course?.thumbnail || "/assets/default-course.jpg"}
                 width={513}
                 height={300}
                 alt="course"
                 className="rounded-md w-[513px]"
               />
               <h1 className="text-[20px] w-[513px] font-bold mt-4">
-                ({course.code}) {course.name}
+                ({course?.code}) {course?.name}
               </h1>
-              <p className="mt-2 w-[513px] text-left">{course.desc}</p>
+              <p className="mt-2 w-[513px] text-left">{course?.desc}</p>
               <div className="bg-[#F2F2F2] w-[513px] p-3">
                 <h2 className="text-[20px] font-bold">What you’ll learn</h2>
                 <ul className="list-disc text-[16px] mt-2">
-                  {/* {
-                    loadingCourse ? <>Loading...</> : (
-                      course[0]?.section.map((section, index) => (
-                        <div key={index} className="flex flex-row gap-2 items-center">
-                          <Image
-                            src="/assets/check.png"
-                            width={14}
-                            height={14}
-                            className="w-[14px] h-[14px]"
-                            alt="check"
-                          />
-                          <p>{section.title}</p>
-                        </div>
-                      ))
-
-                    )
-                  } */}
+                  {course?.section?.length > 0 ? (
+                    course.section.map((section, index) => (
+                      <div
+                        key={index}
+                        className="flex flex-row gap-2 items-center"
+                      >
+                        <Image
+                          src="/assets/check.png"
+                          width={14}
+                          height={14}
+                          className="w-[14px] h-[14px]"
+                          alt="check"
+                        />
+                        <p>{section.title}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p>No sections available</p>
+                  )}
                 </ul>
                 <p className="text-[14px] font-bold">show more</p>
               </div>
             </div>
 
-            {/* <div className="w-[563px]">
+            {/* Course Content Section */}
+            <div className="w-[563px] mt-10">
               <h2 className="text-[24px] font-bold">Course Content</h2>
               <div className="flex flex-col mt-2 gap-3">
-                {course.content.map((section, index) => (
+                {course?.section?.map((section, index) => (
                   <div key={index}>
                     <div
                       className="flex flex-row items-center justify-between cursor-pointer"
@@ -156,18 +172,56 @@ const CourseDetails = () => {
                     >
                       <p className="font-medium text-[16px]">{section.title}</p>
                       <Image
-                        src={expandedSections[index] ? "/assets/collapse.png" : "/assets/add-black.png"}
+                        src={
+                          expandedSections[index]
+                            ? "/assets/collapse.png"
+                            : "/assets/add-black.png"
+                        }
                         width={14}
                         height={14}
-                        className=""
                         alt={expandedSections[index] ? "collapse" : "expand"}
                       />
                     </div>
+
+                    {/* Render Lectures, Assignments, and Quizzes */}
                     {expandedSections[index] && (
-                      <p className="text-[14px] mt-2 text-gray-600">{section.details}</p>
+                      <div className="text-[14px] mt-2 text-gray-600">
+                        <h3 className="font-bold">Lectures</h3>
+                        {section.lectures?.length > 0 ? (
+                          section.lectures.map((lecture) => (
+                            <p key={lecture._id.$oid}>• {lecture.title}</p>
+                          ))
+                        ) : (
+                          <p>No lectures available</p>
+                        )}
+
+                        <h3 className="font-bold mt-4">Assignments</h3>
+                        {section.assignments?.length > 0 ? (
+                          section.assignments.map((assignment) => (
+                            <p key={assignment._id.$oid}>
+                              • {assignment.title} - {assignment.description}
+                            </p>
+                          ))
+                        ) : (
+                          <p>No assignments available</p>
+                        )}
+
+                        <h3 className="font-bold mt-4">Quizzes</h3>
+                        {section.quizzes?.length > 0 ? (
+                          section.quizzes.map((quiz) => (
+                            <p key={quiz._id.$oid}>
+                              • {quiz.title} - {quiz.description}
+                            </p>
+                          ))
+                        ) : (
+                          <p>No quizzes available</p>
+                        )}
+                      </div>
                     )}
                   </div>
                 ))}
+              </div>
+              <div>
                 <button
                   onClick={navigateToLecture}
                   className="flex flex-row gap-3 items-center mt-4 p-2 bg-black justify-center h-[56px] text-white w-full"
@@ -181,34 +235,45 @@ const CourseDetails = () => {
                     alt="lecture room"
                   />
                 </button>
-              </div>
 
-              <div className="flex flex-col gap-4 mt-20">
-                <div>
-                  <p className="text-black font-bold text-[24px]">Lecturer</p>
-                </div>
-                <div className="flex flex-row items-center gap-3">
-                  <Image
-                    src={course?.lecturer_id.image ? course?.lecturer_id.image : "/assets/images/user.png"}
-                    width={50}
-                    height={50}
-                    className="rounded-full"
-                    alt="lecturer"
-                  />
-                  <p>{course.lecturer_id.firstname} {course.lecturer_id.lastname}</p>
-                </div>
-
-                <div>
-                  <p className="text-black font-normal text-[16px]">
-                   {course.lecturer_id.bio}
+                <div className="mt-5 flex flex-col">
+                  <p className="text-black font-semibold text-[20px]">
+                    Lecturer
                   </p>
-                  <p className="font-bold mt-1">show more</p>
+                  {lecturer ? (
+                    <div className="flex flex-row mt-3 items-center justify-items-center gap-3">
+                      <Image
+                        src={lecturer.image || "/assets/images/user.png"}
+                        width={40}
+                        height={40}
+                        className="w-[40px] h-[40px] rounded-full"
+                        alt="Lecturer"
+                      />
+                      <p className="text-black font-semibold text-[18px]">
+                        {`${lecturer.firstname} ${lecturer.lastname}`}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      Lecturer details not available
+                    </div>
+                  )}
+                  <div>
+                    <p className="mt-2 text-black text-[14px]">
+                      {lecturer?.bio || "Lecturer biography not available."}
+                    </p>
+                    <p className="font-bold text-black">show more</p>
+
+                    <button
+                      onClick={navigateToLecturer}
+                      className="border-black mt-3 outline border-0.5 text-[16px] items-center w-full h-[56px] rounded-none"
+                    >
+                      View Profile
+                    </button>
+                  </div>
                 </div>
               </div>
-              <button onClick={navigateToLecturer} className="flex flex-row gap-3 items-center mt-4 p-2 bg-outline border border-black justify-center h-[56px] text-black w-full">
-                View Profile
-              </button>
-            </div> */}
+            </div>
           </div>
         </motion.div>
       </div>

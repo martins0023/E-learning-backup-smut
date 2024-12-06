@@ -14,7 +14,7 @@ const Page = () => {
     {
       id: 1,
       submissionName: "Individual Submission",
-      type: `/student/submissions/assignment/individual${params.id}`,
+      type: `/student/submissions/assignment/individual/${params.id}`,
     },
     {
       id: 2,
@@ -28,30 +28,20 @@ const Page = () => {
     },
   ];
 
-  // Function to handle filtering logic
-  const filteredSubmits = submissionType.filter((student) => {
-    if (filter === "all") return true;
-    return false;
-  });
-
-  // Function to navigate to the specific URL
   const navigateToAddr = (type) => {
-    router.push(type); // Navigate to the provided type URL
+    if (type) {
+      router.push(type);
+    }
   };
 
   return (
     <div className="flex w-full">
-      {/* Sidebar */}
       <Sidebar params={params.id} />
-
-      {/* Main Content */}
       <div className="ml-60 w-full">
-        {/* Dashboard Navigation */}
         <div className="bg-white w-full h-[128px]">
           <DashboardNav params={params.id} />
         </div>
 
-        {/* Content */}
         <motion.div
           className="p-8 flex"
           initial={{ opacity: 0, scale: 0.9, rotate: 10 }}
@@ -65,11 +55,11 @@ const Page = () => {
           }}
         >
           <div className="grid grid-cols-3 gap-[32px] mt-5">
-            {filteredSubmits.map((submitType) => (
+            {submissionType.map((submitType) => (
               <div
                 key={submitType.id}
                 className="bg-[#F9F9F9] w-[311px] h-[163px] border-[0.5px] rounded-md border-primary cursor-pointer"
-                onClick={() => navigateToAddr(submitType.type)} // Pass the type as an argument
+                onClick={() => navigateToAddr(submitType.type)}
               >
                 <div className="flex items-center gap-3 p-4">
                   <div className="items-center flex">
