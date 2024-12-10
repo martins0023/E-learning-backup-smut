@@ -135,7 +135,7 @@ const InboxPage = (props) => {
             </div>
 
             {/* Rich Text Editor with React Quill */}
-            <div className="border border-gray-300 rounded-md p-3 mb-4">
+            <div className="border border-gray-300 rounded-md p-3 mb-4 h-[300px]">
               <DynamicTextEditor value={messageContent} handleDes={handleQuillChange} />
             </div>
 

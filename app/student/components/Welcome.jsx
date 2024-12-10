@@ -19,7 +19,7 @@ const Welcome = async ({data}) => {
           src="/assets/logo.png"
           width={183}
           height={66}
-          className="w-[183px] h-[66px]"
+          className="]"
           alt="logo"
         />
         <p className="text-black font-medium text-[30px] mt-10">

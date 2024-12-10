@@ -63,10 +63,10 @@ const page = () => {
 
   useEffect(() => {
     // Fetch courses for the lecturer
-    const getCourses = async () => {
+    const getStudent = async () => {
       try {
         setLoading(true); // Start loading
-        const response = await GetApi(`api/course/lecturer-course/${params.id}`);
+        const response = await GetApi(`api/student/${params.id}`);
         if (response.success) {
           setCourses(response.data); // Set fetched courses
           setErrorMsg(""); // Clear any error messages
@@ -82,7 +82,7 @@ const page = () => {
     };
 
     if (params.id) {
-      getCourses(); // Only fetch if params.id is available
+      getStudent(); // Only fetch if params.id is available
     }
   }, [params.id]);
   return (

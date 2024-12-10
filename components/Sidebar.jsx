@@ -47,6 +47,7 @@ const Sidebar = (props) => {
         <ul>
           {[
             { name: 'Dashboard', path: `/lecturer/dashboard/${props.params}`, icon: '/assets/dashboard-icon-black.png' },
+            { name: 'Lecture', path: `/lecturer/lecture/${props.params}`, icon: '/assets/lecturer-icon.png' },
             { name: 'Courses', path: `/lecturer/courses/${props.params}`, icon: '/assets/courses-icon.png' },
             { name: 'My Activity', path: `/lecturer/activity/${props.params}`, icon: '/assets/activity-icon.png' },
             { name: 'Time Table', path: `/lecturer/time-table/${props.params}`, icon: '/assets/timetable-icon.png' },
@@ -87,10 +88,7 @@ const Sidebar = (props) => {
           height={162}
           className="mb-10"
         />
-        <Link
-          href="/"
-          className="W-[177PX] flex justify-center items-center text-black underline font-medium"
-        >Logout</Link>
+        
       </nav>
     </aside>
   );

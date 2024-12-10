@@ -8,6 +8,8 @@ import Sidebar from "../../../components/Sidebar";
 import { GetApi } from "../../../../../utils/Actions";
 
 const CourseDetails = () => {
+  const [loading, setLoading] = useState(true);
+
   const searchParams = useSearchParams();
   const params = useParams();
   const courseId = searchParams.get("courseId");
@@ -26,47 +28,38 @@ const CourseDetails = () => {
   };
 
   useEffect(() => {
-    const getStudent = async () => {
+    const fetchCourseDetails = async () => {
       try {
-        setLoadingStudent(true);
-        const response = await GetApi(`api/student/${params.id}`);
-        if (response.success) {
-          setDetails(response.data);
+        setLoading(true);
+
+        // Fetch course data
+        const courseResponse = await GetApi(`api/course/${courseId}`);
+        if (courseResponse.success) {
+          setCourse(courseResponse.data);
           setErrorMsg("");
 
-          setLoadingCourse(true);
-          const result = await GetApi(`api/course/${courseId}`);
-          if (result.success) {
-            setCourse(result.data);
-            setErrorMsg("");
-
-            // Now fetch the lecturer's details using lecturer_id
-            setLoadingLecturer(true);
-            const lecturerResult = await GetApi(`api/lecturer/get-user/${result.data.lecturer_id.$oid}`);
-            if (lecturerResult.success) {
-              setLecturer(lecturerResult.data);
-              setErrorMsg("");
-            } else {
-              setErrorMsg(lecturerResult.message);
-            }
+          // Fetch lecturer data
+          const lecturerResponse = await GetApi(
+            `api/lecturer/${courseResponse.data.lecturer_id}`
+          );
+          if (lecturerResponse.success) {
+            setLecturer(lecturerResponse.data);
           } else {
-            setErrorMsg(result.message);
+            setErrorMsg(lecturerResponse.message);
           }
         } else {
-          setErrorMsg(response.message);
+          setErrorMsg(courseResponse.message);
         }
       } catch (err) {
         console.log(err);
-        setErrorMsg(err.message);
+        setErrorMsg("An error occurred while fetching details.");
       } finally {
-        setLoadingStudent(false);
-        setLoadingCourse(false);
-        setLoadingLecturer(false);
+        setLoading(false);
       }
     };
 
-    getStudent();
-  }, [courseId, params.id]);
+    if (courseId) fetchCourseDetails();
+  }, [courseId]);
 
   const toggleSection = (index) => {
     setExpandedSections((prev) => ({
@@ -75,17 +68,16 @@ const CourseDetails = () => {
     }));
   };
 
-  const navigateToLecture = () => {
-    router.push(`/student/courses/classroom/${params.id}`);
+  const navigateToLecture = (id) => {
+    router.push(`/student/courses/classroom/${params.id}?courseId=${id}`);
   };
 
-  const navigateToLecturer = () => {
-    router.push(`/lecturer/lecturerpublic/${lecturer?.staff_id}`);
+  const navigateToLecturer = (lecturerId) => {
+    router.push(`/student/lecturerpublic/${lecturerId}`);
   };
 
-  if (loadingStudent || loadingCourse) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return <p>Loading...</p>;
+  if (errorMsg) return <p>{errorMsg}</p>;
 
   if (!course) {
     return <div className="text-center">Course details not available</div>;
@@ -223,7 +215,7 @@ const CourseDetails = () => {
               </div>
               <div>
                 <button
-                  onClick={navigateToLecture}
+                  onClick={() => navigateToLecture(course._id)}
                   className="flex flex-row gap-3 items-center mt-4 p-2 bg-black justify-center h-[56px] text-white w-full"
                 >
                   Lecture room
@@ -237,40 +229,32 @@ const CourseDetails = () => {
                 </button>
 
                 <div className="mt-5 flex flex-col">
-                  <p className="text-black font-semibold text-[20px]">
-                    Lecturer
-                  </p>
+                  <p className="text-black font-semibold text-[20px]">Lecturer</p>
                   {lecturer ? (
-                    <div className="flex flex-row mt-3 items-center justify-items-center gap-3">
+                    <div className="flex flex-row mt-3 items-center gap-3">
                       <Image
-                        src={lecturer.image || "/assets/images/user.png"}
+                        src={lecturer?.image || "/assets/images/user.png"}
                         width={40}
                         height={40}
                         className="w-[40px] h-[40px] rounded-full"
                         alt="Lecturer"
                       />
                       <p className="text-black font-semibold text-[18px]">
-                        {`${lecturer.firstname} ${lecturer.lastname}`}
+                        {lecturer?.lecturer_id} {lecturer?.lastname}
                       </p>
                     </div>
                   ) : (
-                    <div className="text-center">
-                      Lecturer details not available
-                    </div>
+                    <p className="text-center">Lecturer details not available.</p>
                   )}
-                  <div>
-                    <p className="mt-2 text-black text-[14px]">
-                      {lecturer?.bio || "Lecturer biography not available."}
-                    </p>
-                    <p className="font-bold text-black">show more</p>
-
+                  <p className="mt-2 text-black text-[14px]">{lecturer?.bio || "Lecturer biography not available."}</p>
+                  {lecturer && (
                     <button
-                      onClick={navigateToLecturer}
+                      onClick={() => navigateToLecturer(lecturer._id)}
                       className="border-black mt-3 outline border-0.5 text-[16px] items-center w-full h-[56px] rounded-none"
                     >
                       View Profile
                     </button>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>

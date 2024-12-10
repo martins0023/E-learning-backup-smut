@@ -5,6 +5,7 @@ import Image from "next/image";
 import DashboardNav from "../../components/DashboardNav";
 import Sidebar from "../../components/Sidebar";
 import { useRouter, useParams } from "next/navigation";
+import { GetApi } from "../../../../utils/Actions";
 
 const months = [
   { name: "January", days: 31 },
@@ -32,6 +33,62 @@ const Timetable = () => {
   const [visibleStartIndex, setVisibleStartIndex] = useState(0); // Track visible days
   const [selectedClass, setSelectedClass] = useState(null); // Track selected class
   const datesContainerRef = useRef(null);
+
+  const [filter, setFilter] = useState("all");
+  const router = useRouter();
+  const [details, setDetails] = useState({});
+  const [courses, setCourses] = useState([]);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loadingStudent, setLoadingStudent] = useState(false);
+  const [loadingCourse, setLoadingCourse] = useState(false);
+
+//   const filteredCourses = coursesData.filter((course) => {
+//     if (filter === "all") return true;
+//     return course.addedTime === filter;
+//   });
+
+  useEffect(() => {
+
+    const getStudent = async () => {
+      try {
+        setLoadingStudent(true);
+        const response = await GetApi(`api/student/${params.id}`);
+        if (response.success) {
+          setDetails(response.data);
+          setErrorMsg("");
+
+          setLoadingCourse(true);
+          await GetApi(
+            `api/course/course-student/student?level=${response.data.level}&department=${response.data.department}`
+          )
+            .then((result) => {
+              if (result.success) {
+                setCourses(result.data);
+                setErrorMsg("");
+              } else {
+                setErrorMsg(result.message);
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              setErrorMsg(err.message);
+            })
+            .finally(() => {
+              setLoadingCourse(false);
+            });
+        } else {
+          setErrorMsg(response.message);
+        }
+      } catch (err) {
+        console.log(err);
+        setErrorMsg(err.message);
+      } finally {
+        setLoadingStudent(false);
+      }
+    };
+
+    getStudent();
+  }, []);
 
   // Generate all days for the selected month
   const generateDays = (monthIndex) => {
@@ -181,83 +238,52 @@ const Timetable = () => {
 
           {/* Timetable Grid */}
           <div className="grid grid-cols-5 gap-4 mt-8">
-            {[
-              {
-                title:
-                  "(CYS 311) Application Security",
-                time: "8am to 10am",
-                typeofClass: "class",
-                courseCode: "CYS 311",
-                dayofweek: "Saturday",
-                lecturer: "Mr Jimoh"
-              },
-              {
-                title: "(CYS 314) Governance risk and policy",
-                time: "10am to 12pm",
-                typeofClass: "class",
-                courseCode: "CYS 314",
-                dayofweek: "Wednesday",
-                lecturer: "Mr Jimoh"
-              },
-              {
-                title: "(CYS 312) System design",
-                time: "12pm to 2pm",
-                typeofClass: "class",
-                courseCode: "CYS 312",
-                dayofweek: "Friday",
-                lecturer: "Mr Najeem"
-              },
-              {
-                title: "Empty Slot",
-                time: "2pm to 4pm",
-                typeofClass: "class",
-                courseCode: "NONE",
-                dayofweek: "Tuesday",
-              },
-              {
-                title: "Empty Slot",
-                time: "4pm to 6pm",
-                typeofClass: "class",
-                courseCode: "NONE",
-                dayofweek: "Monday",
-              },
-            ].map((lecture, index) => (
+            {loadingCourse ? (
+              <>Loading...</>
+            ) : (
+              courses.map((course) => (
               <div
-                key={index}
-                onClick={() => setSelectedClass(lecture)}
+              key={course.id}
+                onClick={() => setSelectedClass(course)}
                 className="border-t-0 h-[380px] border-b-0 border-[1px] cursor-pointer p-3 border-primary"
               >
                 <p className="text-primary font-bold text-center mb-2">
-                  {lecture.time}
+                  {course.schedule.time}
                 </p>
                 <div
-                  key={index}
+                  key={course.id}
                   className="border border-primary h-[286px] bg-[#F9F9F9] p-4 rounded-lg text-center"
                 >
                   <p className="text-primary font-bold text-left">
-                    {lecture.title}
+                    {course.name} ({course.code})
                   </p>
                   <p className="text-primary text-left font-bold text-[20px] mt-2">
-                    {lecture.typeofClass}
+                    class
                   </p>
                 </div>
               </div>
-            ))}
+              ))
+            )}
+            {/* ))} */}
           </div>
           {selectedClass && (
             <div className="fixed right-0 top-0 h-full w-[544px] bg-white p-5 shadow-lg">
               <div className="mt-10">
                 <Image
-                  src="/assets/images/user.png"
+                  src={
+                    selectedClass.lecturer_id?.image
+                      ? selectedClass.lecturer_id.image
+                      : "/assets/images/user.png"
+                  }
                   width={180}
                   height={180}
                   className="w-[180px] h-[180px] rounded-full border border-black boder-[1px]"
-                  alt="next"
+                  alt="Lecturer"
                 />
 
                 <div className="mt-5">
                   <p className="text-black font-semibold text-[32px]">
-                    {selectedClass.lecturer} {/* Display the lecturer's name */}
+                    {selectedClass.lecturer_id.lastname || "No Name Available"} {selectedClass.lecturer_id.firstname || "No Name Available"} {/* Display the lecturer's name */}
                   </p>
                   <p className="font-normal text-[24px]">Lecturer</p>
                 </div>
@@ -280,9 +306,9 @@ const Timetable = () => {
               </div>
               
               <div className="mt-4">
-              <p className="mt-4 text-black font-semibold text-[16px]">{selectedClass.courseCode}</p>
-              <p className="font-normal text-[12px]">{selectedClass.time}</p>
-              <p className="font-normal text-[12px]">{selectedClass.dayofweek}</p>
+              <p className="mt-4 text-black font-semibold text-[16px]">{selectedClass.name || "Course Name"}</p>
+              <p className="font-normal text-[12px]">{selectedClass.schedule.time}</p>
+              <p className="font-normal text-[12px]">{selectedClass.code}</p>
               </div>
               <button
                 onClick={() => setSelectedClass(null)}

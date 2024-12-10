@@ -4,6 +4,7 @@ import Image from "next/image";
 import React, { useState, useEffect, Suspense, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { GetApi } from "../../../../utils/Actions";
+import NotificationModal from "../../components/NotificationModal";
 
 // Dynamically import ReactQuill without SSR
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
@@ -18,7 +19,17 @@ const Page = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const params = useParams();
 
-  
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setModalOpen(true); // Show the modal
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false); // Hide the modal
+  };
+
+
   const [activeTab, setActiveTab] = useState("vlearningProfile");
   //const [biography, setBiography] = useState("");
   //const [isClient, setIsClient] = useState(false); // Track if on client side
@@ -32,8 +43,8 @@ const Page = () => {
     }
   }, []);
 
-  const createCourse = () => {
-    router.push(`/student/dashboard/getstarted/${params.id}`);
+  const JoinClass = () => {
+    router.push(`/student/courses/join-class/${params.id}`);
   };
 
   const navHome = () => {
@@ -60,28 +71,28 @@ const Page = () => {
   };
 
   useEffect(() => {
-  const GetStudent = async () => {
-    try {
-      const response = await GetApi(`api/student/${id}`);
-      if (response.success) {
-        setData(response.data);
-        setCourses(response.data.courses || []); // Assuming courses is inside response.data
-        setErrorMsg("");
-      } else {
-        setErrorMsg(response.message);
+    const GetStudent = async () => {
+      try {
+        const response = await GetApi(`api/student/${id}`);
+        if (response.success) {
+          setData(response.data);
+          setCourses(response.data.courses || []); // Assuming courses is inside response.data
+          setErrorMsg("");
+        } else {
+          setErrorMsg(response.message);
+        }
+      } catch (err) {
+        console.error(err);
+        setErrorMsg(err.message);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error(err);
-      setErrorMsg(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  if (id) {
-    GetStudent();
-  }
-}, [id]); // Run effect when 'id' changes
+    if (id) {
+      GetStudent();
+    }
+  }, [id]); // Run effect when 'id' changes
 
   if (loading) {
     return <p>Loading...</p>; // Show loading while data is being fetched
@@ -106,23 +117,14 @@ const Page = () => {
           />
         </div>
         <button
-          onClick={createCourse}
+          onClick={JoinClass}
           className="bg-primary text-white rounded-md h-[41px] px-6 py-2"
         >
           join the class
         </button>
         <div className="flex items-center cursor-pointer">
-          <div className="relative mr-4">
-            <span className="absolute top-0 right-0 w-4 h-4 bg-primary rounded-full flex items-center justify-center text-xs text-white">
-              5
-            </span>
-            <Image
-              src="/assets/notifications-bell.png"
-              alt="Notifications"
-              className="w-[40px] h-[40px]"
-              width={40}
-              height={40}
-            />
+          <div onClick={handleOpenModal} >
+            <NotificationModal isOpen={isModalOpen} onClose={handleCloseModal} />
           </div>
           <div className="flex items-center">
             <Image
@@ -138,7 +140,7 @@ const Page = () => {
       </header>
 
       <div className="p-20">
-      <div className="mb-10 cursor-pointer" onClick={handleBack}>
+        <div className="mb-10 cursor-pointer" onClick={handleBack}>
           <Image src="/assets/back_icon.png" width={25} height={20} alt="Back" />
         </div>
         <div className="flex flex-row justify-between mb-8">
@@ -215,28 +217,28 @@ const Page = () => {
             </div>
           </div>
         ) : (
-            <div className="w-[862px]">
+          <div className="w-[862px]">
             <label className="block font-semibold mb-4 text-[32px]">Image Preview</label>
             <div className="text-gray-600 text-[20px] mb-2">Minimum 200×200 pixels. Maximum 6000×6000 pixels</div>
-            
+
             {/* Image Preview */}
             <div className="flex justify-center w-[862px] h-[393px] border-[1px] border-black items-center">
               <Image
-                src={data.image ? data.image : {selectedImage}}
+                src={data.image ? data.image : { selectedImage }}
                 alt="Profile Picture"
                 width={320}
                 height={320}
                 className="w-[320px] h-[320px] object-cover"
               />
             </div>
-      
+
             {/* Upload Section */}
             <div className="w-full mt-3 flex flex-row">
               {/* Display File Name */}
               <div className="bg-[#F2F2F2] border-black border-[1px] border-r-0 flex items-center w-[410px] h-[64px]">
                 <p className="text-black text-[20px] ml-4">{fileName}</p>
               </div>
-      
+
               {/* Upload Button */}
               <label className="bg-white flex items-center justify-center border-black border-[1px] w-[452px] h-[64px] cursor-pointer">
                 <p className="text-black font-bold ml-4">Upload file</p>
@@ -248,7 +250,7 @@ const Page = () => {
                 />
               </label>
             </div>
-      
+
             {/* Save Button */}
             <div className="flex justify-end">
               <button className="bg-primary text-white px-6 rounded-full w-[184px] mt-4 text-[24px] h-[64px]">Save</button>

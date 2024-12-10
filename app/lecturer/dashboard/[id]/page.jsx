@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Sidebar from "../../../../components/Sidebar";
@@ -10,18 +10,22 @@ import { GetApi } from "../../../../utils/Actions";
 const Dashboard = () => {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
+  const courseId = searchParams.get("courseId");
 
   const handleGetstarted = () => {
     router.push(`/lecturer/dashboard/getstarted/${params.id}`);
   };
 
-  const JoinClass = () => {
-    router.push(`/dashboard/getstarted`);
-  };
+  const lectureContinue = (id) => {
+    router.push(`/lecturer/lecture/lecture-start/${params.id}/?courseId=${id}`);
+};
 
   const ViewDetails = () => {
-    router.push(`/dashboard/getstarted`);
+    router.push(`/lecturer/dashboard/getstarted`);
   };
+
+  
 
   const [isClient, setIsClient] = useState(false);
   const [course, setCourses] = useState([]);
@@ -50,7 +54,12 @@ const Dashboard = () => {
     }
     getCourses();
 
-  }, []);
+  }, [courseId, params.id]);
+
+  const handleNavigate = (id) => {
+    router.push(`/lecturer/courses/continue/${params.id}/?courseId=${id}`);
+
+};
 
 
 
@@ -99,7 +108,7 @@ const Dashboard = () => {
                             key={index}
                             className="bg-primary h-[250px] w-[233px] p-4 rounded-lg"
                           >
-                            <p className="text-white text-[12px] font-normal">{`Lecture at ${lecture.time? lecture.time : "time no set yet"}`}</p>
+                            <p className="text-white text-[12px] font-normal">{`Lecture at ${lecture.schedule.time ? lecture.schedule.time : "time not set yet"}`}</p>
     
                             <h3 className="text-[20px] font-bold text-white mt-1">
                               {lecture.name}
@@ -111,7 +120,7 @@ const Dashboard = () => {
                                 width={16}
                                 height={16}
                               />
-                              <p className="text-white font-normal text-[12px]">{`Class starts in ${lecture.startsIn}`}</p>
+                              <p className="text-white font-normal text-[12px]">{`Duration ${lecture.schedule.duration}`}</p>
                             </div>
                             <div className="flex flex-row gap-2 items-center mt-2">
                               <Image
@@ -120,13 +129,13 @@ const Dashboard = () => {
                                 width={16}
                                 height={16}
                               />
-                              <p className="text-white font-normal text-[12px]">{`${lecture.date}`}</p>
+                              <p className="text-white font-normal text-[12px]">Day of the week: {`${lecture.schedule.day}`}</p>
                             </div>
                             <div className="flex justify-between mt-4">
-                              <button className="text-[12px] bg-white w-[105px] rounded-sm h-[27px] text-primary justify-items-center text-center items-center">
-                                Join the Class
+                              <button onClick={() => lectureContinue(lecture._id)} className="text-[12px] bg-white w-[105px] rounded-sm h-[27px] text-primary justify-items-center text-center items-center">
+                                Set Class
                               </button>
-                              <button className="text-white text-[10px]">
+                              <button onClick={() => handleNavigate(lecture._id)} className="text-white text-[10px]">
                                 View Details
                               </button>
                             </div>

@@ -31,7 +31,8 @@ const Timetable = (props) => {
   const [data, setData] = useState({})
   const [errorMsg, setErrorMsg] = useState("");
 
-  const [courses, setCourses] = useState([])
+  const [courses, setCourses] = useState([]);
+  const [loadingCourse, setLoadingCourse] = useState(false);
 
   const [activeMonthIndex, setActiveMonthIndex] = useState(
     new Date().getMonth()
@@ -234,83 +235,55 @@ const Timetable = (props) => {
 
           {/* Timetable Grid */}
           <div className="grid grid-cols-5 gap-4 mt-8">
-            {[
-              {
-                title:
-                  "(CYS 311) Introduction to Security and Policy Development",
-                time: "8am to 10am",
-                typeofClass: "class",
-                courseCode: "CYS 311",
-                dayofweek: "Saturday",
-              },
-              {
-                title: "(CYS 314) Mathematics for Cyber Security",
-                time: "10am to 12pm",
-                typeofClass: "class",
-                courseCode: "CYS 314",
-                dayofweek: "Wednesday",
-              },
-              {
-                title: "(CYS 312) Operating Systems Security",
-                time: "12pm to 2pm",
-                typeofClass: "class",
-                courseCode: "CYS 312",
-                dayofweek: "Friday",
-              },
-              {
-                title: "Empty Slot",
-                time: "2pm to 4pm",
-                typeofClass: "class",
-                courseCode: "NONE",
-                dayofweek: "Tuesday",
-              },
-              {
-                title: "Empty Slot",
-                time: "4pm to 6pm",
-                typeofClass: "class",
-                courseCode: "NONE",
-                dayofweek: "Monday",
-              },
-            ].map((lecture, index) => (
+            {loadingCourse ? (
+              <>Loading...</>
+            ) : (
+              courses.map((course) => (
               <div
-                key={index}
-                onClick={() => setSelectedClass(lecture)}
+              key={course.id}
+                onClick={() => setSelectedClass(course)}
                 className="border-t-0 h-[380px] border-b-0 border-[1px] cursor-pointer p-3 border-primary"
               >
                 <p className="text-primary font-bold text-center mb-2">
-                  {lecture.time}
+                  {course.schedule.time}
                 </p>
                 <div
-                  key={index}
+                  key={course.id}
                   className="border border-primary h-[286px] bg-[#F9F9F9] p-4 rounded-lg text-center"
                 >
                   <p className="text-primary font-bold text-left">
-                    {lecture.title}
+                    {course.name} ({course.code})
                   </p>
                   <p className="text-primary text-left font-bold text-[20px] mt-2">
-                    {lecture.typeofClass}
+                    class
                   </p>
                 </div>
               </div>
-            ))}
+              ))
+            )}
+            {/* ))} */}
           </div>
           {selectedClass && (
             <div className="fixed right-0 top-0 h-full w-[544px] bg-white p-5 shadow-lg">
-              <div className="mt-10">
-                <Image
-                  src={data.image ? data.image : "/assets/images/user.png"}
+              <div className="mt-[200px]">
+                {/* <Image
+                  src={
+                    selectedClass?.image
+                      ? selectedClass?.image
+                      : "/assets/images/user.png"
+                  }
                   width={180}
                   height={180}
                   className="w-[180px] h-[180px] rounded-full border border-black boder-[1px]"
-                  alt="next"
-                />
+                  alt="Lecturer"
+                /> */}
 
-                <div className="mt-5">
+                {/* <div className="mt-5">
                   <p className="text-black font-semibold text-[32px]">
-                    {data.lastname} {data.middlename} {data.firstname}
+                  {selectedClass?.lastname || "No Name Available"} {selectedClass?.lecturer_id.firstname || "No Name Available"} 
                   </p>
                   <p className="font-normal text-[24px]">Lecturer</p>
-                </div>
+                </div> */}
 
                 <div className="flex justify-between items-center w-full mb-4 mt-2">
                   <select
@@ -330,9 +303,9 @@ const Timetable = (props) => {
               </div>
               
               <div className="mt-4">
-              <p className="mt-4 text-black font-semibold text-[16px]">{selectedClass.courseCode}</p>
-              <p className="font-normal text-[12px]">{selectedClass.time}</p>
-              <p className="font-normal text-[12px]">{selectedClass.dayofweek}</p>
+              <p className="mt-4 text-black font-semibold text-[16px]">{selectedClass.name || "Course Name"}</p>
+              <p className="font-normal text-[12px]">{selectedClass.schedule.time}</p>
+              <p className="font-normal text-[12px]">{selectedClass.code}</p>
               </div>
               <button
                 onClick={() => setSelectedClass(null)}

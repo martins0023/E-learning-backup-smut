@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { GetApi } from "../../../../utils/Actions";
 import LogoutButton from "../../../../components/LogoutButton";
+import NotificationModal from "../../../../components/NotificationModal";
 
 const GetLecturer = async (id) => {
   try {
@@ -27,6 +28,15 @@ const page = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setModalOpen(true); // Show the modal
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false); // Hide the modal
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,6 +86,8 @@ const page = () => {
     router.back(); // Navigate to the previous page
   };
 
+  
+
   return (
     <section>
       <header className="flex items-center justify-between mb-8 pt-9 mr-5 ml-5">
@@ -99,20 +111,11 @@ const page = () => {
           onClick={createCourse}
           className="bg-primary text-white rounded-md h-[41px] px-6 py-2"
         >
-          Create New Class/Event
+          Create Event
         </button>
         <div className="flex items-center cursor-pointer">
-          <div className="relative mr-4">
-            <span className="absolute top-0 right-0 w-4 h-4 bg-primary rounded-full flex items-center justify-center text-xs text-white">
-              5
-            </span>
-            <Image
-              src="/assets/notifications-bell.png"
-              alt="Notifications"
-              className="w-[40px] h-[40px]"
-              width={40}
-              height={40}
-            />
+          <div onClick={handleOpenModal} >
+            <NotificationModal isOpen={isModalOpen} onClose={handleCloseModal} />
           </div>
           <div className="flex items-center">
             <Image
@@ -120,7 +123,7 @@ const page = () => {
               alt={`${data.firstname} ${data.lastname}`}
               width={50}
               height={50}
-              className="rounded-full"
+              className="rounded-full w-[50px] h-[50px]"
             />
             <p className="ml-2 text-black font-semibold">
               Hi, {data.firstname}
@@ -131,12 +134,12 @@ const page = () => {
 
       <div className="p-20">
         <div className="mb-10 cursor-pointer" onClick={handleBack}>
-        <Image
-              src="/assets/back_icon.png"
-              width={25}
-              height={20}
-              className="w-[25px] h-[20px] rounded-full"
-            />
+          <Image
+            src="/assets/back_icon.png"
+            width={25}
+            height={20}
+            className="w-[25px] h-[20px] rounded-full"
+          />
         </div>
         <div className="flex flex-row justify-between gap-10">
           <div className="flex flex-col">

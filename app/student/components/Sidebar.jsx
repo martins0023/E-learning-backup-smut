@@ -86,10 +86,6 @@ const Sidebar = (props) => {
           height={162}
           className="mb-5"
         />
-        <Link
-          href="/"
-          className="W-[177PX] flex justify-center items-center text-black underline font-medium"
-        >Logout</Link>
       </nav>
     </aside>
   );

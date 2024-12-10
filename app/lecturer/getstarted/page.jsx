@@ -77,7 +77,7 @@ const Signup = () => {
 
           <div className="text-red-700 text-center font-bold">{errorMsg}</div>
 
-          <div className="flex items-center justify-center mt-5">
+          <div className="flex items-center justify-center mt-5 cursor-pointer">
             <Btn label="Continue" handleClick={handleContinue} disabled={inputValue ? false : true} loading={loading} />
           </div>
         </form>

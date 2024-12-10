@@ -64,10 +64,14 @@ const page = () => {
 
     getStudent();
   }, []);
-  
-    const navigateToSchedule = (id) => {
-      router.push(`/student/courses/classroom/start/schedule/${params.id}`); // Navigate to dynamic page
-    };
+
+  const navigateToDetails = (id) => {
+    router.push(`/student/courses/course-detail/${params.id}?courseId=${id}`); // Navigate to dynamic page
+  };
+
+  const navigateToSchedule = (id) => {
+    router.push(`/student/courses/classroom/start/schedule/${params.id}?courseId=${id}`); // Navigate to dynamic page
+  };
     return (
       <div className="flex w-full">
         <Sidebar params={params.id} />
@@ -152,15 +156,15 @@ const page = () => {
 
                                 <div className="flex flex-row items-center gap-[54.5px]">
                                   <Image
-                                    onClick={navigateToSchedule}
+                                    onClick={() => navigateToSchedule(course._id)}
                                     src="/assets/next-east.png"
                                     className="w-[40px] h-[40px] cursor-pointer"
                                     width={40}
                                     height={40}
                                   />
-                                  <p className="text-primary underline font-normal text-[10px]">
+                                  <div key={course.id} onClick={() => navigateToDetails(course._id)} className="cursor-pointer text-primary underline font-normal text-[10px]">
                                     View course
-                                  </p>
+                                  </div>
                                 </div>
                               </div>
                             </div>

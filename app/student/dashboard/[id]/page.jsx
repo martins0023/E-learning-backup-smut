@@ -11,11 +11,11 @@ const Dashboard = () => {
   const router = useRouter();
   const params = useParams();
   const handleAttendance = () => {
-    router.push(`/student/attendance`);
+    router.push(`/student/attendance/${params.id}`);
   };
 
-  const JoinClass = () => {
-    router.push(`/student/courses/classroom/start/${params.id}`);
+  const JoinClass = (id) => {
+    router.push(`/student/courses/classroom/start/${params.id}?courseId=${id}`);
   };
 
   const ViewDetails = (id) => {
@@ -169,7 +169,7 @@ const Dashboard = () => {
                               <p className="text-white font-normal text-[12px]">Day of the week: {`${lecture.schedule.day}`}</p>
                             </div>
                             <div className="flex justify-between mt-4">
-                              <button onClick={() => JoinClass(lecture.class_link.link)} className="text-[12px] bg-white w-[105px] rounded-sm h-[27px] text-primary justify-items-center text-center items-center">
+                              <button key={lecture.id} onClick={() => JoinClass(lecture._id)} className="text-[12px] bg-white w-[105px] rounded-sm h-[27px] text-primary justify-items-center text-center items-center">
                                 Join the Class
                               </button>
                               <button onClick={() => ViewDetails(lecture._id)} className="text-white text-[10px]">

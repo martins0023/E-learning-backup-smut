@@ -46,7 +46,7 @@ const GetStarted = () => {
   }, []);
 
   const handleCancelClick = () => {
-    router.push(`/dashboard`);
+    router.back();
   };
 
   const handleCourseSelect = (e, name, code) => {

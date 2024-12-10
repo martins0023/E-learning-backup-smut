@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { GetApi } from "../../../../utils/Actions";
 import coursesData from "../../data/courses"; // Import course data
-import LogoutButton from "../../../../components/LogoutButton";
+import LogoutButton from "../../components/LogoutButton";
+import NotificationModal from "../../components/NotificationModal";
 
 const Page = () => {
   const router = useRouter();
@@ -14,6 +15,16 @@ const Page = () => {
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [loadingCourse, setLoadingCourse] = useState(false);
+
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setModalOpen(true); // Show the modal
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false); // Hide the modal
+  };
 
   useEffect(() => {
     const GetStudent = async () => {
@@ -86,8 +97,8 @@ const Page = () => {
     router.push(`/student/courses/course-detail/${params.id}?courseId=${id}`); // Navigate to dynamic page
   };
 
-  const createCourse = () => {
-    router.push(`/student/dashboard/getstarted/${id}`);
+  const joinClass = () => {
+    router.push(`/student/courses/join-class/${params.id}`);
   };
 
   const navHome = () => {
@@ -114,16 +125,13 @@ const Page = () => {
           />
         </div>
 
-        <button onClick={createCourse} className="bg-primary text-white rounded-md h-[41px] px-6 py-2">
+        <button onClick={joinClass} className="bg-primary text-white rounded-md h-[41px] px-6 py-2">
           Join class
         </button>
 
         <div className="flex items-center cursor-pointer">
-          <div className="relative mr-4">
-            <span className="absolute top-0 right-0 w-4 h-4 bg-primary rounded-full flex items-center justify-center text-xs text-white">
-              5
-            </span>
-            <Image src="/assets/notifications-bell.png" alt="Notifications" width={40} height={40} />
+          <div onClick={handleOpenModal} >
+            <NotificationModal isOpen={isModalOpen} onClose={handleCloseModal} />
           </div>
 
           <div className="flex items-center">

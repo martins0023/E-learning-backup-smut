@@ -1,14 +1,76 @@
 "use client";
-import React, { useState } from "react"; // Import useState
 import { motion } from "framer-motion";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Sidebar from "../../../../../components/Sidebar";
 import DashboardNav from "../../../../../components/DashboardNav";
+import { GetApi } from "../../../../../../../utils/Actions";
 
 const Page = () => {
   const params = useParams()
   const [isChecked, setIsChecked] = useState(false); // State to track checkbox status
+  const searchParams = useSearchParams();
+  const courseId = searchParams.get("courseId");
+  const router = useRouter();
+  const [details, setDetails] = useState({});
+  const [course, setCourse] = useState(null);
+  const [lecturer, setLecturer] = useState(null);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [loadingStudent, setLoadingStudent] = useState(false);
+  const [loadingCourse, setLoadingCourse] = useState(false);
+  const [loadingLecturer, setLoadingLecturer] = useState(false);
+  const [expandedSections, setExpandedSections] = useState({}); // Track expanded sections
+
+  const handleBack = () => {
+    router.back(); // Navigate to the previous page
+  };
+
+  useEffect(() => {
+    const getStudent = async () => {
+      try {
+        setLoadingStudent(true);
+        const response = await GetApi(`api/student/${params.id}`);
+        if (response.success) {
+          setDetails(response.data);
+          setErrorMsg("");
+
+          setLoadingCourse(true);
+          const result = await GetApi(`api/course/${courseId}`);
+          if (result.success) {
+            setCourse(result.data);
+            setErrorMsg("");
+
+            // Now fetch the lecturer's details using lecturer_id
+            setLoadingLecturer(true);
+            const lecturerResult = await GetApi(`api/course/lecturer-course/${result.data.lecturer_id.$oid}`);
+            console.log("Lecturer ID:", result.data?.lecturer_id);
+            //console.log("Lecturer ID:", lecturerResult);
+            if (lecturerResult.success) {
+              setLecturer(lecturerResult.data);
+              console.log("Lecturer API Data:", lecturerResult.data);
+              setErrorMsg("");
+            } else {
+              setErrorMsg(lecturerResult.message);
+            }
+          } else {
+            setErrorMsg(result.message);
+          }
+        } else {
+          setErrorMsg(response.message);
+        }
+      } catch (err) {
+        console.log(err);
+        setErrorMsg(err.message);
+      } finally {
+        setLoadingStudent(false);
+        setLoadingCourse(false);
+        setLoadingLecturer(false);
+      }
+    };
+
+    getStudent();
+  }, [courseId, params.id]);
 
   const handleCheckboxChange = () => {
     setIsChecked((prev) => !prev); // Toggle checkbox state
@@ -35,7 +97,7 @@ const Page = () => {
           }}
         >
           <div className="flex justify-center items-center flex-row gap-[24px] mt-4">
-            {[
+            {/* {[
               {
                 title: "Networking Essentials (NCC 311)",
                 time: "10:30 AM",
@@ -43,10 +105,10 @@ const Page = () => {
                 date: "Wed Feb 15",
                 lecturerName: "Dr Ajibade Solomon",
               },
-            ].map((lecture, index) => (
-              <div className="flex flex-col" key={index}>
+            ].map((lecture, index) => ( */}
+              <div className="flex flex-col">
                 <p className="text-black font-bold text-[32px] justify-center w-[516px]">
-                  {lecture.title}
+                  ({course?.code}) {course?.name}
                 </p>
 
                 <div className="bg-[#E7E7E7] w-[516px] h-[82px] gap-10 mt-10 p-4 items-center justify-center flex">
@@ -64,10 +126,10 @@ const Page = () => {
 
                 {/* Button with conditional styles */}
                 <button
-                  className={`flex flex-row gap-3 items-center text-[24px] font-normal mt-[40px] p-2 rounded-full justify-center h-[56px] w-full ${
+                  className={`flex flex-row gap-3 cursor-pointer items-center text-[24px] font-normal mt-[40px] p-2 rounded-full justify-center h-[56px] w-full ${
                     isChecked
-                      ? "bg-[#E4E4E4] cursor-not-allowed"
-                      : "bg-primary text-white"
+                      ? "bg-primary text-white"
+                      : "bg-[#E4E4E4] cursor-not-allowed"
                   }`}
                   disabled={isChecked} // Disable the button when checked
                 >
@@ -93,7 +155,7 @@ const Page = () => {
                   />
                 </div>
               </div>
-            ))}
+            {/* ))} */}
           </div>
         </motion.div>
       </div>

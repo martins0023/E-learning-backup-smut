@@ -18,7 +18,7 @@ const Welcome = ({data}) => {
           src="/assets/logo.png"
           width={183}
           height={66}
-          className="w-[183px] h-[66px]"
+          className=""
           alt="logo"
         />
         <p className="text-black font-medium text-[30px] mt-10">
@@ -43,9 +43,9 @@ const Welcome = ({data}) => {
       <div className="mt-5">
         <div
           onClick={navContinue}
-          className="flex items-center justify-center bg-primary text-white font-normal text-[20px] w-[691px] rounded-full h-[64px]"
+          className="flex items-center cursor-pointer justify-center bg-primary text-white font-normal text-[20px] w-[691px] rounded-full h-[64px]"
         >
-          Go to Login
+          Go to Dashboard
         </div>
       </div>
     </div>

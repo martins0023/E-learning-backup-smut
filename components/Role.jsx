@@ -52,7 +52,7 @@ const Role = () => {
           src="/assets/logo.png"
           width={183}
           height={66}
-          className="w-[183px] h-[66px]"
+          className=""
           alt="logo"
         />
         <p className="text-black font-bold text-[30px] mt-5">

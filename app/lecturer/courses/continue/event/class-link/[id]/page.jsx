@@ -161,7 +161,7 @@ const Page = () => {
               {/* Cancel and Done Buttons */}
               <div className="flex gap-8 items-center justify-center mt-6 mb-20">
                 <button
-                  onClick={() => router.push("/dashboard")}
+                  onClick={() => router.push("/lecturer/dashboard")}
                   className="px-6 py-2 h-[53px] bg-white items-center border w-[163px] border-primary text-primary rounded-full"
                 >
                   Cancel
