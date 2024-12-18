@@ -10,19 +10,19 @@ const studentGroup = [
     {
       id: 1,
       studentName: "Ojo Oyewole",
-      studentMatric: "CS/HND/F22/3260",
+      studentMatric: "CYS/HND/F22/3280",
       image: "/assets/images/user.png"
     },
     {
       id: 2,
-      studentName: "Sarah Bouchard",
-      studentMatric: "CS/HND/F22/3260",
+      studentName: "Ayomikun Omotosho",
+      studentMatric: "CYS/HND/F22/3411",
       image: "/assets/images/user.png"
     },
     {
       id: 3,
       studentName: "Miracle Abidemi",
-      studentMatric: "CS/HND/F22/3260",
+      studentMatric: "CYS/HND/F22/3260",
       image: "/assets/images/user.png"
     },
   ];
@@ -93,7 +93,7 @@ const page = () => {
                 <div className="bg-[#F2F2F2] w-[641px] p-3 mt-3">
                 <h2 className="text-[20px] font-bold  text-black">Assignment</h2>
                 <ul className="list-disc text-[16px] mt-2">
-                <p className="text-black"> Q1. enim ad minim veniam, quis nostrud exeration ullamco laboris nisi ut aliquip ex ea commod.</p>
+                <p className="text-black">Highlight the roles of Governance risk and policy in monitoring and ensuring proper security in today's world.</p>
                     <div className="flex flex-row gap-2 items-center">
                       <Image
                         src="/assets/check.png"
@@ -102,7 +102,7 @@ const page = () => {
                         className="w-[14px] h-[14px]"
                         alt="add"
                       />
-                      <p className="text-black"> Ut enim ad minim veniam, quis nostrud exeration ullamco laboris nisi ut aliquip ex ea commod.</p>
+                      <p className="text-black"> Application security is a form of ensuring applications are secured and are not a threat, kindly discuss.</p>
                     </div>
                 </ul>
                 <p className="text-[14px] font-bold text-black">show more</p>
